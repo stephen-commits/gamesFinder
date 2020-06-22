@@ -8,25 +8,20 @@
 
 import SwiftUI
 
-private let dateFormatter: DateFormatter = {
-    let dateFormatter = DateFormatter()
-    dateFormatter.dateStyle = .medium
-    dateFormatter.timeStyle = .medium
-    return dateFormatter
-}()
+let maxId = 1
 
 struct ContentView: View {
-    @State private var dates = [Date]()
-
+    @State private var games = [Game]()
+    
     var body: some View {
         NavigationView {
-            MasterView(dates: $dates)
-                .navigationBarTitle(Text("Master"))
+            MasterView(games: $games)
+                .navigationBarTitle(Text("Vos jeux"))
                 .navigationBarItems(
                     leading: EditButton(),
                     trailing: Button(
                         action: {
-                            withAnimation { self.dates.insert(Date(), at: 0) }
+                            withAnimation { self.games.insert(Game(name: "New Game",released_year: 2020), at: 0) }
                         }
                     ) {
                         Image(systemName: "plus")
@@ -38,34 +33,30 @@ struct ContentView: View {
 }
 
 struct MasterView: View {
-    @Binding var dates: [Date]
+    @Binding var games: [Game]
 
     var body: some View {
         List {
-            ForEach(dates, id: \.self) { date in
+            ForEach(games, id: \.id) { game in
                 NavigationLink(
-                    destination: DetailView(selectedDate: date)
+                    destination: DetailView(selectedGame: game)
                 ) {
-                    Text("\(date, formatter: dateFormatter)")
+                    Text(game.description)
                 }
             }.onDelete { indices in
-                indices.forEach { self.dates.remove(at: $0) }
+                indices.forEach { self.games.remove(at: $0) }
             }
         }
     }
 }
 
 struct DetailView: View {
-    var selectedDate: Date?
+    var selectedGame: Game?
 
     var body: some View {
         Group {
-            if selectedDate != nil {
-                Text("\(selectedDate!, formatter: dateFormatter)")
-            } else {
-                Text("Le détail des jeux s'affiche ici")
-            }
-        }.navigationBarTitle(Text("Detail"))
+            Text(selectedGame?.description ?? "An error as occured")
+        }.navigationBarTitle(Text("Votre jeux"))
     }
 }
 
